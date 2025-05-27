@@ -1,0 +1,39 @@
+name: Test and Coverage
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api/simple_aws_auth_with_rate_limit
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov genbadge[all]
+
+      - name: Run tests with coverage
+        run: |
+          pytest --cov=app --cov-report=xml
+          genbadge coverage -i coverage.xml -o coverage.svg
+
+      - name: Commit and push coverage badge
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add coverage.svg
+          git commit -m "Update coverage badge" || echo "No changes"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

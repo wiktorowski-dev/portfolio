@@ -7,7 +7,7 @@ from app.models import auth as auth_model
 
 @cursor_wrapper
 async def get_user_by_email(email: str, cursor=None) -> auth_model.UserId | None:
-    query = f'SELECT id, email FROM {os.environ["ACCOUNTS_SCHEMA"]}.users WHERE email = %s'
+    query = f'SELECT id, email FROM {os.environ["SQL_SCHEMA"]}.users WHERE email = %s'
     await cursor.execute(query, (email,))
 
     fetch = await cursor.fetchone()
@@ -22,8 +22,8 @@ async def get_user_by_id(id_: str, cursor=None) -> auth_model.User | None:
     query = f'''
     SELECT 
         u.id as user_id, u.email, s.*
-    FROM {os.environ["ACCOUNTS_SCHEMA"]}.users u
-    INNER JOIN {os.environ["ACCOUNTS_SCHEMA"]}.account_settings s
+    FROM {os.environ["SQL_SCHEMA"]}.users u
+    INNER JOIN {os.environ["SQL_SCHEMA"]}.account_settings s
     ON u.id = s.user_id 
     WHERE u.id = %s
     '''
@@ -54,15 +54,11 @@ async def create_user(user_id: str, user_email: str, newsletter_subscribed: bool
         )
     )
 
-    query = f'INSERT INTO {os.environ["ACCOUNTS_SCHEMA"]}.users (id, email) VALUES (%s, %s)'
+    query = f'INSERT INTO {os.environ["SQL_SCHEMA"]}.users (id, email) VALUES (%s, %s)'
     await cursor.execute(query, (db_user.id, db_user.email))
-
-    account_settings = db_user.account_settings.dict()
-    query_account_settings = f'INSERT INTO {os.environ["ACCOUNTS_SCHEMA"]}.account_settings ({", ".join(account_settings.keys())}) VALUES ({", ".join(["%s" for _ in account_settings.values()])})'
-    await cursor.execute(query_account_settings, tuple(account_settings.values()))
 
 
 @cursor_wrapper
 async def delete_user_by_id(id_: str, cursor=None):
-    query = f'DELETE FROM {os.environ["ACCOUNTS_SCHEMA"]}.users WHERE id = %s'
+    query = f'DELETE FROM {os.environ["SQL_SCHEMA"]}.users WHERE id = %s'
     await cursor.execute(query, (id_,))

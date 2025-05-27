@@ -5,7 +5,7 @@ from app.utils.sql_connection import fetch_one_dict, cursor_wrapper
 
 @cursor_wrapper
 async def get_internal_data(cursor=None) -> list[dict] | None:
-    query = f'SELECT * FROM {os.environ["ACCOUNTS_SCHEMA"]}.internal_data'
+    query = f'SELECT * FROM {os.environ["SQL_SCHEMA"]}.internal_data'
     await cursor.execute(query)
 
     fetch = await cursor.fetchall()

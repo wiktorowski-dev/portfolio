@@ -2,7 +2,7 @@
 
 ## Overview
 
-This notebook showcases how I use **[PySpark](https://pola.rs)** for fast and efficient data analysis. I work with the NYC Yellow Taxi dataset and combine it with NYC daily weather to explore how weather affects taxi usage.
+This notebook showcases how I use **[PySpark](https://spark.apache.org/docs/latest/api/python/index.html)** for fast and efficient data analysis. I work with the NYC Yellow Taxi dataset and combine it with NYC daily weather to explore how weather affects taxi usage.
 
 ## What It Shows
 

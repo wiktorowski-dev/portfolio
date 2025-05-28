@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  spark-master:
+    image: bitnami/spark:3.5.1
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+    ports:
+      - "8085:8080" # UI
+      - "7077:7077" # Master port
+    networks:
+      - spark-network
+
+  spark-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=1G
+    depends_on:
+      - spark-master
+    networks:
+      - spark-network
+
+networks:
+  spark-network:
+    driver: bridge

@@ -17,6 +17,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"  # Optional: load from .env if needed
+        extra = 'allow'
 
 
 @lru_cache

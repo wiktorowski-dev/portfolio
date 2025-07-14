@@ -1,20 +1,15 @@
-from fastapi import Depends, HTTPException, APIRouter, Query, UploadFile, File
+from fastapi import Depends, HTTPException, APIRouter
 
 
 router = APIRouter()
 
 
 @router.get("/sign_in")
-def sign_in(transaction_id: str):
+def sign_in():
     ...
 
 
 @router.get("/sign_up")
 def sign_up():
-    ...
-
-
-@router.get("/")
-def list_transactions(customer_id: str = None, product_id: str = None,  page: int = Query(default=1, ge=1)):
     ...
 

@@ -3,29 +3,23 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import RedirectResponse, JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
 
-# from app.routers import api_router
 from app.core import settings
-from app import routes
+from app import routes, utils
+from app.utils import database
 
 
 
 @asynccontextmanager
 async def setup_sql(app: FastAPI):
     try:
-
-        db_url = (
-            f"postgresql+asyncpg://"
-            f"{settings.postgres_user}:{settings.postgres_password}"
-            f"@"
-            f"{settings.postgres_host}:{settings.postgres_port}"
-            f"/{settings.postgres_db}"
+        session = database.create_async_db_connection(
+            user=settings.postgres_user,
+            password=settings.postgres_password,
+            host=settings.postgres_host,
+            port=settings.postgres_port,
+            db=settings.postgres_db
         )
-
-        engine = create_async_engine(db_url, echo=True)
-        session = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
         app.state.sql_session = session
 
         yield

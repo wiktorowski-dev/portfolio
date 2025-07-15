@@ -26,7 +26,7 @@ async def get_transaction(
     return TransactionResponse.model_validate(details)
 
 
-@router.get("/", response_model=PaginatedTransactionResponse)
+@router.get("", response_model=PaginatedTransactionResponse)
 async def list_transactions(
     customer_id: Optional[UUID4] = Query(default=None),
     product_id: Optional[UUID4] = Query(default=None),
@@ -59,7 +59,7 @@ async def upload_transaction_file(
 
     content = await file.read()
 
-    task = process_transactions_file(content.decode())
+    task = await process_transactions_file(content.decode())
 
     return TaskStatus(
         task_id=task.task_id,

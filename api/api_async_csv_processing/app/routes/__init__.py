@@ -1,5 +1,5 @@
-from .reports import router as reports
-from .transactions import router as transactions
-from .auth import router as auth
-from .task import router as task
-from .user import router as user
+from .reports import router as reports_router
+from .transactions import router as transactions_router
+from .auth import router as auth_router
+from .task import router as task_router
+from .user import router as user_router

@@ -6,6 +6,7 @@ from app.models.task import TaskStatusResponse, TaskStatus, TaskDetailsResponse
 from app.dependencies.auth import get_current_user
 from app.crud import task as task_crud
 from app.dependencies import db_session as db_session_dependency
+from app import exceptions
 
 router = APIRouter()
 
@@ -18,6 +19,9 @@ async def get_task_status(
 ) -> TaskStatusResponse:
     task_details = AsyncResult(task_id)
     task_sql_details = await task_crud.get_task_details(task_id, db_session)
+
+    if task_sql_details is None:
+        raise exceptions.MISSING_TASK
 
     return TaskStatusResponse(
         task_id=task_id,

@@ -58,11 +58,11 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-app.include_router(routes.auth, prefix='/auth', tags=['auth'])
-app.include_router(routes.reports, prefix='/reports', tags=['reports'])
-app.include_router(routes.transactions, prefix='/transactions', tags=['transactions'])
-app.include_router(routes.task, prefix='/task', tags=['task'])
-app.include_router(routes.user, prefix='/user', tags=['user'])
+app.include_router(routes.auth_router, prefix='/auth', tags=['auth'])
+app.include_router(routes.reports_router, prefix='/reports', tags=['reports'])
+app.include_router(routes.transactions_router, prefix='/transactions', tags=['transactions'])
+app.include_router(routes.task_router, prefix='/task', tags=['task'])
+app.include_router(routes.user_router, prefix='/user', tags=['user'])
 
 
 @app.get("/health")

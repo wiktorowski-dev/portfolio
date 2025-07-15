@@ -4,7 +4,7 @@ from fastapi.responses import RedirectResponse, JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from app.core import settings
+from app.core import get_settings
 from app import routes, utils
 from app.utils import database
 from app.models import base
@@ -14,6 +14,7 @@ from app.models import base
 @asynccontextmanager
 async def setup_sql(app: FastAPI):
     try:
+        settings = get_settings()
         db_connection_kwargs = dict(
             user=settings.postgres_user,
             password=settings.postgres_password,
@@ -49,7 +50,9 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,  # Specify allowed origins
+    allow_origins=[
+        "http://localhost:4200",
+    ],
     allow_credentials=True,  # Allow cookies and credentials
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers

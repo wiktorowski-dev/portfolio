@@ -1,11 +1,12 @@
 from sqlalchemy import select, func, case
+import uuid
 
 from app.models.transactions import Transaction
 from app.models import reports as reports_model
 from app.models.currency import CurrencyRates
 
 
-async def get_customer_summary(*, customer_id: str, session_factory, start_date: str = None, end_date: str = None):
+async def get_customer_summary(*, customer_id: uuid.uuid4, session_factory, start_date: str = None, end_date: str = None):
     currency_rates = CurrencyRates()
 
     stmt = (

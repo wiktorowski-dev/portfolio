@@ -11,10 +11,6 @@ class Settings(BaseSettings):
     postgres_port: str = Field(..., env="postgres_port")
     postgres_db: str = Field(..., env="transactions_db")
 
-    cors_origins: List[str] = [
-        "http://localhost:4200",
-    ]
-
     class Config:
         env_file = ".env"  # Optional: load from .env if needed
         extra = 'allow'
@@ -24,4 +20,4 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     return Settings()
 
-settings = get_settings()
+# settings = get_settings()

@@ -10,7 +10,7 @@ from app.utils import database
 from app.models import transactions as transactions_model
 from app.models import task as task_model
 from celery_app.celery_worker import celery_app
-from celery_app.config import settings
+from celery_app.config import get_settings
 
 
 UUID_RE = re.compile(
@@ -136,6 +136,7 @@ def process_transactions_file(self, csv_content: str) -> dict[str, int]:
         ])
     )
 
+    settings = get_settings()
     session = database.create_async_db_connection(
         user=settings.postgres_user,
         password=settings.postgres_password,

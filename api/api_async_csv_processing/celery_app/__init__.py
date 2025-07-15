@@ -1,7 +1,7 @@
 from celery import Celery
 import os
 
-broker_uri = os.environ['celery_broker_uri']
+broker_uri = os.getenv('celery_broker_uri')
 
 celery_app = Celery(
     "worker",

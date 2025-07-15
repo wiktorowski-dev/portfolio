@@ -32,7 +32,7 @@ class TransactionResponse(BaseModel):
     quantity: int
 
     class Config:
-        from_attributes = True  # if using Pydantic v2
+        from_attributes = True
 
 
 class PaginatedTransactionResponse(BaseModel):

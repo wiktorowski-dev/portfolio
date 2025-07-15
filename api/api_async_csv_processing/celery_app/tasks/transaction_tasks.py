@@ -1,6 +1,6 @@
 import polars as pl
 from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import datetime
+from datetime import datetime, UTC
 import os
 import re
 import asyncio
@@ -8,6 +8,7 @@ import polars.selectors as cs
 
 from app.utils import database
 from app.models import transactions as transactions_model
+from app.models import task as task_model
 from celery_app.celery_worker import celery_app
 from celery_app.config import settings
 
@@ -38,8 +39,19 @@ async def _insert_transactions(records: list[dict], session):
             session.add_all(objs)
 
 
-@celery_app.task(queue="transactions", name="transaction_tasks.process_transactions_file")
-def process_transactions_file(csv_content: str) -> dict[str, int]:
+async def _insert_task_details(task_id: str, correct_records_count: int, incorrect_records_count: int, session):
+    async with session() as session:
+        async with session.begin():
+            task_obj = task_model.Task(
+                task_id=task_id,
+                correct_records_count=correct_records_count,
+                incorrect_records_count=incorrect_records_count,
+            )
+            session.add_all([task_obj])
+
+
+@celery_app.task(bind=True, queue="transactions", name="transaction_tasks.process_transactions_file")
+def process_transactions_file(self, csv_content: str) -> dict[str, int]:
     """
     Validate, split and load transactions.
     """
@@ -133,6 +145,18 @@ def process_transactions_file(csv_content: str) -> dict[str, int]:
     )
 
     records = good_df.to_dicts()
-    asyncio.run(_insert_transactions(records, session))
+
+
+    loop = asyncio.new_event_loop()
+
+    loop.run_until_complete(_insert_transactions(records, session))
+    loop.run_until_complete(_insert_task_details(
+        self.request.id,
+        len(good_df),
+        len(bad_df),
+        session
+    )
+    )
+
 
     return {"inserted": len(good_df), "rejected": len(bad_df)}

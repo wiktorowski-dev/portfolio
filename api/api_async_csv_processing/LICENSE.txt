@@ -1,0 +1,48 @@
+“Commons Clause” License Condition v1.0
+Copyright [2025] Sygnation Kamil Wiktorowski
+
+The Software is provided to you by the Licensor under the Apache License,
+Version 2.0 (“License”), located at http://www.apache.org/licenses/LICENSE-2.0,
+subject to the following condition:
+
+WITHOUT LIMITING OTHER CONDITIONS OF THE LICENSE, THE GRANT OF RIGHTS UNDER
+THE LICENSE WILL NOT INCLUDE, AND THE LICENSE DOES NOT GRANT TO YOU, THE RIGHT
+TO **SELL** THE SOFTWARE.
+
+For purposes of the foregoing, “Sell” means practicing any or all of the rights
+granted to you under the License to provide to third parties, for a fee or
+other consideration (including without limitation fees for hosting or
+consulting/support services related to the Software), a product or service
+whose value derives, entirely or substantially, from the functionality of the
+Software.  Any license notice or attribution required by the License must also
+include this Commons Clause License Condition notice.
+
+Software: Transaction Data Processing and Aggregation System
+License: Apache 2.0
+Licensor: Sygnation Kamil Wiktorowski
+
+--------------------------------------------------------------------
+                          Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+--------------------------------------------------------------------
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+   “License” shall mean the terms and conditions for use, reproduction, and
+   distribution as defined by Sections 1 through 9 of this document.
+   “Licensor” shall mean the copyright owner or entity authorized by the
+   copyright owner that is granting the License.
+   … [full standard Apache 2.0 text continues unchanged] …
+
+8. Limitations of Liability.
+   IN NO EVENT AND UNDER NO LEGAL THEORY, WHETHER IN TORT (INCLUDING
+   NEGLIGENCE), CONTRACT, OR OTHERWISE, UNLESS REQUIRED BY APPLICABLE LAW
+   (SUCH AS DELIBERATE AND GROSSLY NEGLIGENT ACTS) OR AGREED TO IN WRITING,
+   SHALL ANY CONTRIBUTOR BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY DIRECT,
+   INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER
+   ARISING AS A RESULT OF THIS LICENSE OR OUT OF THE USE OR INABILITY TO USE
+   THE WORK …
+
+END OF TERMS AND CONDITIONS

@@ -1,5 +1,23 @@
 
 services:
+  api:
+    build: .
+    container_name: csv_transactions_api
+    restart: unless-stopped
+    ports:
+      - "8085:8080"
+    environment:
+      postgres_user: user
+      postgres_password: Password123!
+      postgres_host: postgres
+      postgres_port: 5432
+      postgres_db: transactions_db
+      JWT_SECRET: supersecretkey
+      celery_broker_uri: redis://redis:6379
+    depends_on:
+      - postgres
+      - celery
+
   postgres:
     image: postgres:16
     container_name: csv_transactions_db
@@ -19,7 +37,7 @@ services:
       - "6379:6379"
     command: ["redis-server", "--save", '""', "--appendonly", "no"]
 
-  worker:
+  celery:
     build:
       context: .
       dockerfile: celery_app/celery.Dockerfile

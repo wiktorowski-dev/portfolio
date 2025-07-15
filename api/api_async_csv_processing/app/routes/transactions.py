@@ -59,7 +59,7 @@ async def upload_transaction_file(
 
     content = await file.read()
 
-    task = await process_transactions_file(content.decode())
+    task = process_transactions_file(content.decode())
 
     return TaskStatus(
         task_id=task.task_id,

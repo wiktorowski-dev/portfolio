@@ -1,8 +1,10 @@
 from sqlalchemy import Column, String, Float, Integer, DateTime
 from sqlalchemy.dialects.postgresql import UUID
-from .base import Base
 import uuid
 import datetime
+from pydantic import BaseModel, UUID4
+
+from .base import Base
 
 
 class Transaction(Base):
@@ -18,3 +20,23 @@ class Transaction(Base):
     product_id = Column(UUID(as_uuid=True), nullable=False, index=True)
 
     quantity = Column(Integer, nullable=False)
+
+
+class TransactionResponse(BaseModel):
+    transaction_id: UUID4
+    timestamp: datetime.datetime
+    amount: float
+    currency: str
+    customer_id: UUID4
+    product_id: UUID4
+    quantity: int
+
+    class Config:
+        from_attributes = True  # if using Pydantic v2
+
+
+class PaginatedTransactionResponse(BaseModel):
+    total: int
+    page: int
+    limit: int
+    items: list[TransactionResponse]

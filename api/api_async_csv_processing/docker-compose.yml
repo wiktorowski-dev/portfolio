@@ -5,7 +5,7 @@ services:
     container_name: csv_transactions_api
     restart: unless-stopped
     ports:
-      - "8085:8080"
+      - "8080:8080"
     environment:
       postgres_user: user
       postgres_password: Password123!

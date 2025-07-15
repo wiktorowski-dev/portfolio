@@ -2,6 +2,7 @@ import pytest
 import uuid
 from fastapi import status
 
+
 @pytest.mark.asyncio
 async def test_health_endpoint(client):
     resp = await client.get("/health")

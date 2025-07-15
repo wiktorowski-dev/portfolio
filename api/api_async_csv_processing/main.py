@@ -7,20 +7,28 @@ from contextlib import asynccontextmanager
 from app.core import settings
 from app import routes, utils
 from app.utils import database
+from app.models import base
 
 
 
 @asynccontextmanager
 async def setup_sql(app: FastAPI):
     try:
-        session = database.create_async_db_connection(
+        db_connection_kwargs = dict(
             user=settings.postgres_user,
             password=settings.postgres_password,
             host=settings.postgres_host,
             port=settings.postgres_port,
             db=settings.postgres_db
         )
+
+        session = database.create_async_db_connection(**db_connection_kwargs)
         app.state.sql_session = session
+
+        # Create databases
+        engine = database.create_async_db_engine(**db_connection_kwargs)
+        async with engine.begin() as conn:
+            await conn.run_sync(base.Base.metadata.create_all)
 
         yield
     finally:
@@ -50,6 +58,7 @@ app.add_middleware(
 app.include_router(routes.auth, prefix='/auth', tags=['auth'])
 app.include_router(routes.reports, prefix='/reports', tags=['reports'])
 app.include_router(routes.transactions, prefix='/transactions', tags=['transactions'])
+app.include_router(routes.task, prefix='/task', tags=['task'])
 
 
 @app.get("/health")

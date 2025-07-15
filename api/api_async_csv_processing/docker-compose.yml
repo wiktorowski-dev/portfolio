@@ -1,17 +1,17 @@
 
 services:
-#  postgres:
-#    image: postgres:16
-#    container_name: csv_transactions_db
-#    restart: unless-stopped
-#    environment:
-#      POSTGRES_USER: user
-#      POSTGRES_PASSWORD: Password123!
-#      POSTGRES_DB: transactions_db
-#    ports:
-#      - "5432:5432"
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data
+  postgres:
+    image: postgres:16
+    container_name: csv_transactions_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: Password123!
+      POSTGRES_DB: transactions_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:7
@@ -25,9 +25,14 @@ services:
       dockerfile: celery_app/celery.Dockerfile
     depends_on:
       - redis
-#      - postgres
+      - postgres
     environment:
       celery_broker_uri: redis://redis:6379
+      postgres_user: user
+      postgres_password: Password123!
+      postgres_host: postgres
+      postgres_port: 5432
+      postgres_db: transactions_db
 
 
 volumes:

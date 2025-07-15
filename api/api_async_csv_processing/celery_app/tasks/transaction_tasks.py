@@ -1,6 +1,7 @@
 import polars as pl
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
+import os
 import re
 import asyncio
 import polars.selectors as cs
@@ -8,6 +9,7 @@ import polars.selectors as cs
 from app.utils import database
 from app.models import transactions as transactions_model
 from celery_app.celery_worker import celery_app
+from celery_app.config import settings
 
 
 UUID_RE = re.compile(
@@ -122,11 +124,15 @@ def process_transactions_file(csv_content: str) -> dict[str, int]:
         ])
     )
 
-    # for row in bad_df.rows(named=True):
-    #     logging.warning("Invalid transaction skipped: %s", row)
-    #
-    # records = good_df.to_dicts()
-    # asyncio.run(_insert_transactions(records))
+    session = database.create_async_db_connection(
+        user=settings.postgres_user,
+        password=settings.postgres_password,
+        host=settings.postgres_host,
+        port=settings.postgres_port,
+        db=settings.postgres_db
+    )
 
-    print('Processed')
+    records = good_df.to_dicts()
+    asyncio.run(_insert_transactions(records, session))
+
     return {"inserted": len(good_df), "rejected": len(bad_df)}

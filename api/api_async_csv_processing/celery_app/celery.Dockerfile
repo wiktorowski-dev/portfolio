@@ -28,6 +28,5 @@ RUN pip install --no-cache-dir -U "celery[redis]"
 USER appuser
 
 ENV PYTHONPATH=/app
-RUN ls
 CMD ["celery", "-A", "celery_app.celery_worker", "worker", "-Q", "celery", "--loglevel=info"]
 

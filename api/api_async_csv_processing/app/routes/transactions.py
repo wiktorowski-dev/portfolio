@@ -1,6 +1,6 @@
 from fastapi import Depends, HTTPException, APIRouter, Query, UploadFile, File
-from celery.result import AsyncResult
 
+from app.models.task import TaskStatus
 from app.tasks.transaction_tasks import process_transactions_file
 
 router = APIRouter()
@@ -16,10 +16,10 @@ def list_transactions(customer_id: str = None, product_id: str = None,  page: in
     ...
 
 
-@router.post("/upload")
+@router.post("/upload", response_model=TaskStatus)
 async def upload_transaction_file(
     file: UploadFile = File(...)
-):
+) -> TaskStatus:
     """
     Upload a CSV file containing transaction data.
     The file should contain columns for transaction details.
@@ -33,9 +33,7 @@ async def upload_transaction_file(
     task = process_transactions_file(content.decode())
     # task = process_transactions_file(content.decode())
 
-    return {
-        "status": "accepted",
-        "task_id": task.id,
-        "message": "File is being processed in background"
-    }
-
+    return TaskStatus(
+        task_id=task.task_id,
+        status=task.status,
+    )

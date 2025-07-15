@@ -68,7 +68,7 @@ def _get_sql_session():
 @celery_app.task(bind=True, queue="transactions", name="transaction_tasks.process_transactions_file")
 def process_transactions_file(self, csv_content: str) -> dict[str, int]:
     try:
-        processing_result = _process_transactions_file(self, csv_content)
+        processing_result = _process_transactions_file(csv_content)
         msg = ''
     except Exception as e:
         processing_result = {"inserted": 0, "rejected": 0}
@@ -91,7 +91,7 @@ def process_transactions_file(self, csv_content: str) -> dict[str, int]:
 
 
 
-def _process_transactions_file(self, csv_content: str) -> dict[str, int]:
+def _process_transactions_file(csv_content: str) -> dict[str, int]:
     """
     Validate, split and load transactions.
     """

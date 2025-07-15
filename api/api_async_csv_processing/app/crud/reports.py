@@ -25,6 +25,11 @@ async def get_customer_summary(*, customer_id: uuid.uuid4, session_factory, star
         .where(Transaction.customer_id == customer_id)
     )
 
+    if start_date:
+        stmt = stmt.where(Transaction.timestamp >= start_date)
+    if end_date:
+        stmt = stmt.where(Transaction.timestamp <= end_date)
+
     async with session_factory() as session:
         result = await session.execute(stmt)
         row = result.mappings().one_or_none()

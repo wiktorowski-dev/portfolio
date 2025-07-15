@@ -19,6 +19,8 @@ class Task(Base):
     correct_records_count = Column(Integer, default=0, nullable=False)
     incorrect_records_count = Column(Integer, default=0, nullable=False)
 
+    msg = Column(String, nullable=True)
+
 
 class TaskStatus(BaseModel):
     task_id: str
@@ -30,6 +32,7 @@ class TaskDetailsResponse(BaseModel):
     timestamp: datetime.datetime
     correct_records_count: int
     incorrect_records_count: int
+    msg: Optional[str] = None
 
     class Config:
         from_attributes = True

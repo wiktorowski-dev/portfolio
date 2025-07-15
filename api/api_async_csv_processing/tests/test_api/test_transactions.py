@@ -71,7 +71,7 @@ async def test_upload_transactions_file_success(monkeypatch, async_client, auth_
     task_id = str(uuid4())
     fake = SimpleNamespace(task_id=task_id, status="PENDING")
 
-    monkeypatch.setattr("app.routes.transactions.process_transactions_file", AsyncMock(return_value=fake))
+    monkeypatch.setattr("app.routes.transactions.process_transactions_file", lambda x: fake)
 
     csv_bytes = b"a,b,c\n1,2,3"
     files = {"file": ("data.csv", csv_bytes, "text/csv")}

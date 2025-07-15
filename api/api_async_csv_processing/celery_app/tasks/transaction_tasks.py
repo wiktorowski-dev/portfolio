@@ -1,6 +1,7 @@
 import polars as pl
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, UTC
+import traceback
 import os
 import re
 import asyncio
@@ -39,19 +40,58 @@ async def _insert_transactions(records: list[dict], session):
             session.add_all(objs)
 
 
-async def _insert_task_details(task_id: str, correct_records_count: int, incorrect_records_count: int, session):
+async def _insert_task_details(task_id: str, correct_records_count: int, incorrect_records_count: int, msg: str, session):
     async with session() as session:
         async with session.begin():
             task_obj = task_model.Task(
                 task_id=task_id,
                 correct_records_count=correct_records_count,
                 incorrect_records_count=incorrect_records_count,
+                msg=msg
             )
             session.add_all([task_obj])
 
 
+def _get_sql_session():
+    settings = get_settings()
+    session = database.create_async_db_connection(
+        user=settings.postgres_user,
+        password=settings.postgres_password,
+        host=settings.postgres_host,
+        port=settings.postgres_port,
+        db=settings.postgres_db
+    )
+
+    return session
+
+
 @celery_app.task(bind=True, queue="transactions", name="transaction_tasks.process_transactions_file")
 def process_transactions_file(self, csv_content: str) -> dict[str, int]:
+    try:
+        processing_result = _process_transactions_file(self, csv_content)
+        msg = ''
+    except Exception as e:
+        processing_result = {"inserted": 0, "rejected": 0}
+        msg = str(e)
+
+    loop = asyncio.new_event_loop()
+
+    loop.run_until_complete(
+        _insert_task_details(
+            self.request.id,
+            processing_result.get("inserted", 0),
+            processing_result.get("rejected", 0),
+            msg,
+            _get_sql_session()
+        )
+    )
+
+    if msg:
+        raise Exception(msg)
+
+
+
+def _process_transactions_file(self, csv_content: str) -> dict[str, int]:
     """
     Validate, split and load transactions.
     """
@@ -136,28 +176,12 @@ def process_transactions_file(self, csv_content: str) -> dict[str, int]:
         ])
     )
 
-    settings = get_settings()
-    session = database.create_async_db_connection(
-        user=settings.postgres_user,
-        password=settings.postgres_password,
-        host=settings.postgres_host,
-        port=settings.postgres_port,
-        db=settings.postgres_db
-    )
 
     records = good_df.to_dicts()
 
-
+    session = _get_sql_session()
     loop = asyncio.new_event_loop()
 
     loop.run_until_complete(_insert_transactions(records, session))
-    loop.run_until_complete(_insert_task_details(
-        self.request.id,
-        len(good_df),
-        len(bad_df),
-        session
-    )
-    )
-
 
     return {"inserted": len(good_df), "rejected": len(bad_df)}

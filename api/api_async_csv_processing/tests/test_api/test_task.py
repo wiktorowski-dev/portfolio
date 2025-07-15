@@ -37,7 +37,8 @@ async def test_get_task_status_success(monkeypatch, async_client):
         "task_id": sql.task_id,
         "timestamp": sql.timestamp.isoformat(),
         "correct_records_count": sql.correct_records_count,
-        "incorrect_records_count": sql.incorrect_records_count
+        "incorrect_records_count": sql.incorrect_records_count,
+        "msg": None,
     }
 
 
@@ -77,5 +78,6 @@ async def test_get_all_tasks(monkeypatch, async_client, auth_headers):
         "task_id": sample.task_id,
         "timestamp": sample.timestamp.isoformat(),
         "correct_records_count": sample.correct_records_count,
-        "incorrect_records_count": sample.incorrect_records_count
+        "incorrect_records_count": sample.incorrect_records_count,
+        "msg": None,
     }

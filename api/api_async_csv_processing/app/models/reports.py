@@ -1,20 +1,32 @@
-from sqlalchemy import Column, String, Float, Integer, DateTime
-from sqlalchemy.dialects.postgresql import UUID
-from .base import Base
-import uuid
-import datetime
+from pydantic import BaseModel, model_validator
+from datetime import datetime
 
 
-class Transaction(Base):
-    __tablename__ = "reports"
+def _round_currency(value: float) -> float:
+    return round(value, 2)
 
-    transaction_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
 
-    amount = Column(Float, nullable=False)
-    currency = Column(String(3), nullable=False)
+class CustomerReport(BaseModel):
+    total_spent: float
+    unique_products: int
+    last_transaction: datetime
 
-    customer_id = Column(UUID(as_uuid=True), nullable=False, index=True)
-    product_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    @model_validator(mode="before")
+    def round_values(cls, values):
+        if 'total_spent' in values:
+            values['total_spent'] = _round_currency(values['total_spent'])
+        return values
 
-    quantity = Column(Integer, nullable=False)
+
+class ProductReport(BaseModel):
+    total_quantity: int
+    total_revenue_pln: float
+    unique_customers: int
+
+    @model_validator(mode="before")
+    def round_values(cls, values):
+        if 'total_revenue_pln' in values:
+            values['total_revenue_pln'] = _round_currency(values['total_revenue_pln'])
+        return values
+
+

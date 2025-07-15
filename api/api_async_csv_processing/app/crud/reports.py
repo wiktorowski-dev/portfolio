@@ -1,16 +1,20 @@
-from sqlalchemy import select, func
+from sqlalchemy import select, func, case
 
 from app.models.transactions import Transaction
+from app.models import reports as reports_model
+from app.models.currency import CurrencyRates
 
 
-async def get_customer_summary(customer_id: str):
-    total_spent_query = (
+async def get_customer_summary(*, customer_id: str, session_factory, start_date: str = None, end_date: str = None):
+    currency_rates = CurrencyRates()
+
+    stmt = (
         select(
             func.sum(
-                func.case(
-                    (Transaction.currency == 'PLN', Transaction.amount),
-                    (Transaction.currency == 'EUR', Transaction.amount * 4.3),
-                    (Transaction.currency == 'USD', Transaction.amount * 4.0),
+                case(
+                    (Transaction.currency == 'PLN', Transaction.amount * currency_rates.PLN),
+                    (Transaction.currency == 'EUR', Transaction.amount * currency_rates.EUR),
+                    (Transaction.currency == 'USD', Transaction.amount * currency_rates.USD),
                     else_=0.0
                 )
             ).label("total_spent"),
@@ -19,19 +23,47 @@ async def get_customer_summary(customer_id: str):
         )
         .where(Transaction.customer_id == customer_id)
     )
-    print('ok')
-    return {
-        "spend_amount_pln": 0,
-        "number_of_items_bought": 0,
-        "last_transaction_data": ""
-    }
+
+    async with session_factory() as session:
+        result = await session.execute(stmt)
+        row = result.mappings().one_or_none()
+        result = dict(row)
+
+    if any([v is None for v in result.values()]):
+        return None
+
+    return reports_model.CustomerReport(**result)
 
 
-async def get_product_summary(product_id: str, start_date: str, end_date: str):
-    return {
-        "total_sold_amount": 0,
-        "total_revenue_generated": 0,
-        "number_of_unique_clients": ""
-    }
+async def get_product_summary(*, product_id: str, session_factory, start_date: str = None, end_date: str = None):
+    currency_rates = CurrencyRates()
 
+    stmt = (
+        select(
+            func.sum(Transaction.quantity).label("total_quantity"),
+            func.sum(
+                case(
+                    (Transaction.currency == 'PLN', Transaction.amount * currency_rates.PLN),
+                    (Transaction.currency == 'EUR', Transaction.amount * currency_rates.EUR),
+                    (Transaction.currency == 'USD', Transaction.amount * currency_rates.USD),
+                    else_=0.0
+                )
+            ).label("total_revenue_pln"),
+            func.count(func.distinct(Transaction.customer_id)).label("unique_customers")
+        )
+        .where(Transaction.product_id == product_id)
+    )
 
+    if start_date:
+        stmt = stmt.where(Transaction.timestamp >= start_date)
+    if end_date:
+        stmt = stmt.where(Transaction.timestamp <= end_date)
+
+    async with session_factory() as session:
+        row = (await session.execute(stmt)).mappings().one_or_none()
+        result = dict(row)
+
+    if any([v is None for v in result.values()]):
+        return None
+
+    return reports_model.ProductReport(**result)

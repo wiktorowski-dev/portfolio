@@ -2,13 +2,14 @@ from fastapi import Depends, HTTPException, APIRouter, Query, UploadFile, File
 
 from app.models.task import TaskStatus
 from app.tasks.transaction_tasks import process_transactions_file
+from app.crud import transactions
 
 router = APIRouter()
 
 
 @router.get("/{transaction_id}")
-def get_transaction(transaction_id: str):
-    ...
+async def get_transaction(transaction_id: str):
+    return await transactions.get_transaction_details(transaction_id)
 
 
 @router.get("/")

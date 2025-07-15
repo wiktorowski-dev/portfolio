@@ -22,8 +22,8 @@ async def setup_sql(app: FastAPI):
             db=settings.postgres_db
         )
 
-        session = database.create_async_db_connection(**db_connection_kwargs)
-        app.state.sql_session = session
+        session_factory  = database.create_async_db_connection(**db_connection_kwargs)
+        app.state.session_factory = session_factory
 
         # Create databases
         engine = database.create_async_db_engine(**db_connection_kwargs)
